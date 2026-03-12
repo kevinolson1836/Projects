@@ -1,0 +1,41 @@
+---
+import '../styles/editor.css';
+import 'highlight.js/styles/github-dark.css';
+import ActivityBar from '../components/ActivityBar.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Tabs from '../components/Tabs.astro';
+import StatusBar from '../components/StatusBar.astro';
+
+interface Props {
+  title: string;
+  currentTab: string;
+  projects: { slug: string; title: string }[];
+  currentSlug?: string;
+}
+
+const { title, currentTab, projects, currentSlug } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} — Kevin's Lab</title>
+  </head>
+  <body>
+    <div class="editor-layout">
+      <ActivityBar />
+      <Sidebar projects={projects} currentSlug={currentSlug} />
+      <main class="editor-main">
+        <Tabs currentTab={currentTab} projects={projects} />
+        <div class="editor-content">
+          <div class="editor-content-inner">
+            <slot />
+          </div>
+        </div>
+        <StatusBar currentTab={currentTab} />
+      </main>
+    </div>
+  </body>
+</html>

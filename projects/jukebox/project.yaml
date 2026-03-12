@@ -1,0 +1,9 @@
+slug: jukebox
+title: NFC Jukebox
+status: building
+progress: 30
+started: 2025-06-01
+tags:
+  - embedded
+  - esp32
+  - audio

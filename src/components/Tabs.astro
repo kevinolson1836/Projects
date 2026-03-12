@@ -1,0 +1,25 @@
+---
+interface Props {
+  currentTab: string;
+  projects: { slug: string; title: string }[];
+}
+
+const { currentTab, projects } = Astro.props;
+---
+
+<div class="editor-tabs">
+  <a
+    href="/"
+    class:list={['editor-tab', { active: currentTab === 'dashboard.md' }]}
+  >
+    <span class="tab-name">dashboard.md</span>
+  </a>
+  {projects.map((p) => (
+    <a
+      href={`/projects/${p.slug}`}
+      class:list={['editor-tab', { active: currentTab === `${p.slug}.md` }]}
+    >
+      <span class="tab-name">{p.slug}.md</span>
+    </a>
+  ))}
+</div>

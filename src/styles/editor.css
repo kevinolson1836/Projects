@@ -1,0 +1,674 @@
+/* Kevin's Lab - VSCode-style editor theme */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  /* VSCode Dark+ workbench colors */
+  --editor-bg: #1e1e1e;
+  --editor-fg: #d4d4d4;
+  --sidebar-bg: #252526;
+  --sidebar-title-fg: #cccccc;
+  --activity-bar-bg: #333333;
+  --activity-bar-fg: #ffffff;
+  --activity-bar-active: #ffffff;
+  --tabs-bg: #252526;
+  --tab-inactive-bg: #2d2d2d;
+  --tab-active-bg: #1e1e1e;
+  --tab-active-border: #007acc;
+  --tab-inactive-fg: #969696;
+  --tab-active-fg: #ffffff;
+  --list-hover-bg: #2a2d2e;
+  --list-active-bg: #094771;
+  --list-active-fg: #ffffff;
+  --text: #d4d4d4;
+  --text-muted: #858585;
+  --accent: #3794ff;
+  --accent-hover: #569cd6;
+  --border: #3c3c3c;
+  --sidebar-width: 220px;
+  --activity-bar-width: 48px;
+  --status-bar-height: 22px;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--editor-bg);
+  color: var(--editor-fg);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* VSCode-like scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--editor-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 10px;
+  border: 2px solid var(--editor-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4e4e4e;
+}
+
+.editor-layout {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ========== Activity bar (far left) ========== */
+.activity-bar {
+  width: var(--activity-bar-width);
+  min-width: var(--activity-bar-width);
+  background: var(--activity-bar-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+  flex-shrink: 0;
+}
+
+.activity-bar-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  color: var(--activity-bar-fg);
+  opacity: 0.7;
+  cursor: default;
+  position: relative;
+}
+
+.activity-bar-item.active {
+  opacity: 1;
+  color: var(--activity-bar-active);
+}
+
+.activity-bar-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--activity-bar-active);
+}
+
+.activity-bar-item svg {
+  width: 24px;
+  height: 24px;
+}
+
+.activity-bar-item {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ========== Sidebar ========== */
+.editor-sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  height: 35px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--sidebar-title-fg);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebar-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--sidebar-title-fg);
+  cursor: pointer;
+  border-radius: 2px;
+  opacity: 0.8;
+}
+
+.sidebar-collapse-btn:hover {
+  background: var(--list-hover-bg);
+  opacity: 1;
+}
+
+.sidebar-expand-tab {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(100%, -50%);
+  width: 24px;
+  height: 48px;
+  padding: 0;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-title-fg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.sidebar-expand-tab:hover {
+  background: var(--list-hover-bg);
+}
+
+.editor-sidebar {
+  position: relative;
+  transition: width 0.2s ease, min-width 0.2s ease;
+}
+
+.editor-sidebar.collapsed {
+  width: 0;
+  min-width: 0;
+  border-right: none;
+  overflow: visible;
+}
+
+.editor-sidebar.collapsed .sidebar-header,
+.editor-sidebar.collapsed .sidebar-content {
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.editor-sidebar.collapsed .sidebar-expand-tab[hidden] {
+  display: flex !important;
+}
+
+.editor-sidebar.collapsed .sidebar-expand-tab {
+  display: flex !important;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sidebar panels: show one based on data-active */
+.sidebar-panel {
+  display: none;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+#sidebar-panels[data-active="explorer"] #panel-explorer,
+#sidebar-panels[data-active="work"] #panel-work {
+  display: flex;
+}
+
+/* Collapsible project folder (details/summary) */
+.tree-project {
+  margin: 0;
+  padding: 0;
+}
+
+.tree-project-summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 12px;
+  height: 22px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.tree-project-summary::-webkit-details-marker,
+.tree-project-summary::marker {
+  display: none;
+}
+
+.tree-project-summary:hover {
+  background: var(--list-hover-bg);
+}
+
+.tree-project-summary .chevron {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.tree-project-summary .chevron svg {
+  width: 10px;
+  height: 10px;
+  transition: transform 0.15s ease;
+}
+
+.tree-project[open] .tree-project-summary .chevron svg {
+  transform: rotate(90deg);
+}
+
+.tree-project .sidebar-file-list {
+  padding-left: 0;
+}
+
+.tree-project .sidebar-file-list a {
+  padding-left: 36px;
+}
+
+.tree-project .tree-placeholder {
+  padding-left: 36px;
+}
+
+.tree-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 36px;
+  height: 22px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: default;
+}
+
+/* Tree: section (e.g. PROJECTS folder) */
+.tree-section {
+  user-select: none;
+}
+
+.tree-section-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 12px;
+  height: 22px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.tree-section-header:hover {
+  background: var(--list-hover-bg);
+  color: var(--text);
+}
+
+.tree-section-header .chevron {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.tree-section-header .chevron svg {
+  width: 10px;
+  height: 10px;
+  transition: transform 0.15s ease;
+}
+
+.tree-section-header .tree-folder-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tree-section.expanded .tree-section-header .chevron svg {
+  transform: rotate(90deg);
+}
+
+.tree-section-children {
+  overflow: hidden;
+}
+
+.tree-section.collapsed .tree-section-children {
+  display: none;
+}
+
+.sidebar-file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-file-list a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px 2px 22px;
+  height: 22px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 13px;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.sidebar-file-list a:hover {
+  background: var(--list-hover-bg);
+}
+
+.sidebar-file-list a[aria-current="page"] {
+  background: var(--list-active-bg);
+  color: var(--list-active-fg);
+}
+
+.sidebar-file-list .file-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.sidebar-file-list a[aria-current="page"] .file-icon {
+  opacity: 1;
+}
+
+.sidebar-file-list .file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========== Main: tabs + editor + status bar ========== */
+.editor-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ========== Tabs (VSCode style: blue top border when active) ========== */
+.editor-tabs {
+  display: flex;
+  align-items: flex-end;
+  background: var(--tabs-bg);
+  border-bottom: 1px solid var(--border);
+  min-height: 35px;
+  flex-shrink: 0;
+}
+
+.editor-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  height: 35px;
+  margin-bottom: -1px;
+  background: var(--tab-inactive-bg);
+  color: var(--tab-inactive-fg);
+  text-decoration: none;
+  font-size: 13px;
+  max-width: 180px;
+  min-width: 80px;
+  transition: color 0.1s ease, background 0.1s ease;
+  border: 1px solid transparent;
+  border-bottom: none;
+  position: relative;
+}
+
+.editor-tab:hover {
+  color: var(--text);
+}
+
+.editor-tab.active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-fg);
+  z-index: 1;
+}
+
+.editor-tab.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--tab-active-border);
+}
+
+.editor-tab .tab-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ========== Editor content ========== */
+.editor-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px 24px;
+  background: var(--editor-bg);
+}
+
+.editor-content-inner {
+  max-width: 800px;
+}
+
+/* Markdown in editor */
+.editor-content h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.editor-content h2 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 24px 0 12px;
+}
+
+.editor-content h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+
+.editor-content p {
+  margin: 0 0 12px;
+}
+
+.editor-content blockquote {
+  margin: 12px 0;
+  padding: 8px 16px;
+  border-left: 4px solid var(--accent);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+}
+
+.editor-content ul,
+.editor-content ol {
+  margin: 0 0 12px;
+  padding-left: 24px;
+}
+
+.editor-content li {
+  margin: 4px 0;
+}
+
+.editor-content a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.editor-content a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+/* Code blocks */
+.editor-content pre {
+  margin: 16px 0;
+  padding: 0;
+  background: #1e1e1e;
+  border: 1px solid var(--border);
+  overflow: auto;
+}
+
+.editor-content pre code {
+  display: block;
+  padding: 12px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+  background: none;
+  border: none;
+}
+
+.editor-content :not(pre) > code {
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+/* Images in markdown */
+.editor-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  display: block;
+  margin: 12px 0;
+}
+
+.editor-content p img {
+  margin: 8px 0;
+}
+
+/* ========== Status bar ========== */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--status-bar-height);
+  min-height: var(--status-bar-height);
+  padding: 0 8px;
+  background: #007acc;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.status-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+/* ========== Dashboard / progress ========== */
+.progress-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  overflow: hidden;
+  min-width: 120px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--tab-active-border);
+  transition: width 0.2s ease;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.stats-grid p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.project-list-dashboard {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+
+.project-list-dashboard li {
+  margin: 8px 0;
+}
+
+.project-list-dashboard a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.project-list-dashboard a:hover {
+  text-decoration: underline;
+}

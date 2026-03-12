@@ -1,0 +1,17 @@
+---
+interface Props {
+  currentTab: string;
+}
+const { currentTab } = Astro.props;
+---
+
+<footer class="status-bar">
+  <div class="status-bar-left">
+    <span class="status-bar-item" title="Current file">{currentTab}</span>
+    <span class="status-bar-item">Markdown</span>
+  </div>
+  <div class="status-bar-right">
+    <span class="status-bar-item">UTF-8</span>
+    <span class="status-bar-item">Ln 1, Col 1</span>
+  </div>
+</footer>

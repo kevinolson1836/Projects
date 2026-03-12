@@ -1,0 +1,172 @@
+---
+import { workItems } from '../lib/work';
+
+interface Props {
+  projects: { slug: string; title: string }[];
+  currentSlug?: string;
+}
+
+const { projects, currentSlug } = Astro.props;
+---
+
+<aside class="editor-sidebar" id="editor-sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-header-title" id="sidebar-title">Explorer</span>
+    <button type="button" class="sidebar-collapse-btn" id="sidebar-collapse-btn" title="Collapse sidebar" aria-label="Collapse sidebar">
+      <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M10 12L6 8l4-4v8z"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-content" id="sidebar-panels" data-active="explorer">
+    <!-- Explorer panel: PROJECTS = main header, then dashboard + collapsible project folders -->
+    <div class="sidebar-panel" id="panel-explorer">
+      <div class="tree-section expanded">
+        <div class="tree-section-header tree-section-label">
+          <span class="chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 4L10 8L6 12V4Z"/></svg>
+          </span>
+          <span class="tree-folder-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="16" height="16">
+              <path fill="#90A4AE" d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.51 8.49V13h-12V7h4.49l.35-.15.86-.86H14v4.5z"/>
+            </svg>
+          </span>
+          PROJECTS
+        </div>
+        <div class="tree-section-children">
+          <ul class="sidebar-file-list">
+            <li>
+              <a href="/" aria-current={!currentSlug ? 'page' : undefined}>
+                <span class="file-icon">
+                  <svg viewBox="0 0 16 16" width="16" height="16">
+                    <path fill="#519ABA" d="M13.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L13.5 3zM13 13H3V3h3.29l.85.85.36.14H13v9z"/>
+                  </svg>
+                </span>
+                <span class="file-name">dashboard.md</span>
+              </a>
+            </li>
+          </ul>
+          {projects.map((p) => (
+            <details class="tree-project" data-project={p.slug} open={currentSlug === p.slug}>
+              <summary class="tree-project-summary">
+                <span class="chevron" aria-hidden="true">
+                  <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 4L10 8L6 12V4Z"/></svg>
+                </span>
+                <span class="tree-folder-icon">
+                  <svg viewBox="0 0 16 16" width="16" height="16">
+                    <path fill="#90A4AE" d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3zm-.51 8.49V13h-12V7h4.49l.35-.15.86-.86H14v4.5z"/>
+                  </svg>
+                </span>
+                <span class="file-name">{p.slug}</span>
+              </summary>
+              <ul class="sidebar-file-list">
+                <li>
+                  <a href={`/projects/${p.slug}`} aria-current={currentSlug === p.slug ? 'page' : undefined}>
+                    <span class="file-icon">
+                      <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="#519ABA" d="M13.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L13.5 3zM13 13H3V3h3.29l.85.85.36.14H13v9z"/>
+                      </svg>
+                    </span>
+                    <span class="file-name">notes.md</span>
+                  </a>
+                </li>
+                <li>
+                  <span class="tree-placeholder">
+                    <span class="file-icon">
+                      <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="#90A4AE" d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3z"/>
+                      </svg>
+                    </span>
+                    <span class="file-name">images</span>
+                  </span>
+                </li>
+              </ul>
+            </details>
+          ))}
+        </div>
+      </div>
+    </div>
+    <!-- Work panel -->
+    <div class="sidebar-panel" id="panel-work">
+      <div class="tree-section expanded">
+        <div class="tree-section-header tree-section-label">
+          <span class="chevron" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor"><path d="M6 4L10 8L6 12V4Z"/></svg>
+          </span>
+          <span class="tree-folder-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="#90A4AE" stroke-width="1.5">
+              <rect x="2" y="4" width="12" height="10" rx="1"/>
+              <path d="M4 4V2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/>
+            </svg>
+          </span>
+          WORK
+        </div>
+        <div class="tree-section-children">
+          <ul class="sidebar-file-list">
+            {workItems.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                >
+                  <span class="file-icon">
+                    <svg viewBox="0 0 16 16" width="16" height="16">
+                      <path fill="#519ABA" d="M13.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L13.5 3zM13 13H3V3h3.29l.85.85.36.14H13v9z"/>
+                    </svg>
+                  </span>
+                  <span class="file-name">{item.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="sidebar-expand-tab" id="sidebar-expand-tab" title="Expand sidebar" aria-label="Expand sidebar" hidden>
+    <svg viewBox="0 0 16 16" width="14" height="14"><path fill="currentColor" d="M6 12l4-4-4-4v8z"/></svg>
+  </button>
+</aside>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const KEY = 'kevins-lab-sidebar-collapsed';
+    const sidebar = document.getElementById('editor-sidebar');
+    const collapseBtn = document.getElementById('sidebar-collapse-btn');
+    const expandTab = document.getElementById('sidebar-expand-tab');
+    const panels = document.getElementById('sidebar-panels');
+    const title = document.getElementById('sidebar-title');
+
+    function setCollapsed(collapsed) {
+      if (!sidebar) return;
+      sidebar.classList.toggle('collapsed', collapsed);
+      if (expandTab) expandTab.hidden = !collapsed;
+      try { localStorage.setItem(KEY, collapsed ? '1' : ''); } catch (_) {}
+    }
+
+    function isCollapsed() {
+      try { return localStorage.getItem(KEY) === '1'; } catch (_) { return false; }
+    }
+
+    if (isCollapsed()) setCollapsed(true);
+
+    collapseBtn?.addEventListener('click', () => setCollapsed(true));
+    expandTab?.addEventListener('click', () => setCollapsed(false));
+
+    if (panels && title) {
+      const updateTitle = () => {
+        const active = panels.dataset.active || 'explorer';
+        title.textContent = active === 'work' ? 'Work' : 'Explorer';
+      };
+      updateTitle();
+      const observer = new MutationObserver(updateTitle);
+      observer.observe(panels, { attributes: true, attributeFilter: ['data-active'] });
+    }
+
+    // Keep current project folder open when navigating
+    const currentProject = document.querySelector('.tree-project a[aria-current="page"]')?.closest('.tree-project');
+    const currentSlug = currentProject?.dataset.project;
+    document.querySelectorAll('.tree-project').forEach((el) => {
+      if (el.getAttribute('data-project') === currentSlug) el.setAttribute('open', '');
+    });
+  });
+</script>
