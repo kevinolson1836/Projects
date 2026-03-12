@@ -8,6 +8,8 @@ marked.setOptions({
     }
     return hljs.highlightAuto(code).value;
   },
+    gfm: true,
+    breaks: true
 });
 
 /**
@@ -20,19 +22,25 @@ export function renderMarkdown(md: string, imageBaseUrl?: string): string {
   if (!imageBaseUrl) {
     return marked.parse(md) as string;
   }
+
   const base = imageBaseUrl.replace(/\/?$/, '/');
   const escapeAttr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-  const renderer = {
-    image(this: marked.Renderer, token: marked.Tokens.Image) {
-      const href = token.href ?? '';
-      const resolved =
-        href.startsWith('.') || (!href.startsWith('/') && !href.startsWith('http'))
-          ? base + href.replace(/^\.\//, '')
-          : href;
-      const title = token.title ? ` title="${escapeAttr(token.title)}"` : '';
-      const alt = escapeAttr(token.text ?? '');
-      return `<img src="${escapeAttr(resolved)}" alt="${alt}"${title}>`;
-    },
+
+  const renderer = new marked.Renderer();
+
+  renderer.image = function (token: marked.Tokens.Image) {
+    const href = token.href ?? '';
+
+    const resolved =
+      href.startsWith('.') || (!href.startsWith('/') && !href.startsWith('http'))
+        ? base + href.replace(/^\.\//, '')
+        : href;
+
+    const title = token.title ? ` title="${escapeAttr(token.title)}"` : '';
+    const alt = escapeAttr(token.text ?? '');
+
+    return `<img src="${escapeAttr(resolved)}" alt="${alt}"${title}>`;
   };
+
   return marked.parse(md, { renderer }) as string;
 }
