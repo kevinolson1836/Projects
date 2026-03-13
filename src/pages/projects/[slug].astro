@@ -2,6 +2,7 @@
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import { loadProjects } from '../../lib/projects';
 import { renderMarkdown } from '../../lib/markdown';
+import ModelViewerInit from '../../components/ModelViewerInit.astro';
 
 export function getStaticPaths() {
   const projects = loadProjects();
@@ -15,7 +16,7 @@ const { project } = Astro.props;
 const projects = loadProjects();
 const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
 
-const notesHtml = renderMarkdown(project.notes, `/images/${project.slug}/`);
+const notesHtml = renderMarkdown(project.notes, `/images/${project.slug}/`, project.slug);
 ---
 
 <EditorLayout
@@ -33,4 +34,6 @@ const notesHtml = renderMarkdown(project.notes, `/images/${project.slug}/`);
 
   <h2>Build Log</h2>
   <Fragment set:html={notesHtml} />
+
+  <ModelViewerInit />
 </EditorLayout>

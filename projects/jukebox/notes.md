@@ -30,3 +30,6 @@
 ## day 6 
 - Soildered them bad boys together and shoved it all in place and it all works!
 - just need to print more music disks and we should be done! :)
+
+--------------
+[Record model](3d-models/BASIC-RECORD.obj)

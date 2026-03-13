@@ -4,51 +4,48 @@ import { loadProjects } from '../lib/projects';
 
 const projects = loadProjects();
 const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
-
-const totalProjects = projects.length;
-const esp32Builds = projects.filter((p) => p.tags.includes('embedded') || p.tags.includes('esp32')).length;
-const pcbsDesigned = projects.filter((p) => p.tags.includes('pcb')).length;
-const activeProjects = projects.filter((p) => p.status === 'building' && p.progress > 0);
 ---
 
 <EditorLayout
   title="Kevin's Lab"
-  currentTab="dashboard.md"
+  currentTab="readme.md"
   projects={projectList}
 >
   <h1>Kevin's Lab</h1>
 
-  <blockquote>
-    Embedded systems experiments and project logs
-  </blockquote>
+  <p>
+    This site is a <strong>dev log</strong> of my projects. I use it to document what I'm building with quick notes and ideas I jot down while working—think of it as a scratchpad that happens to live on the web.
+  </p>
 
-  <h2>Stats</h2>
-  <div class="stats-grid">
-    <p><strong>Projects:</strong> {totalProjects}</p>
-    <p><strong>ESP32 Builds:</strong> {esp32Builds}</p>
-    <p><strong>PCBs Designed:</strong> {pcbsDesigned}</p>
-  </div>
+  <p>
+    <strong>Don't expect much in terms of content.</strong> You'll mostly find rough notes, half-baked thoughts, and snippets. There may be mistakes, typos, or outdated bits. That's by design: this is where I capture ideas in the moment, not polished docs.
+  </p>
 
-  <h2>Active Projects</h2>
-  <ul class="project-list-dashboard">
-    {activeProjects.map((p) => (
-      <li>
-        <div class="progress-bar">
-          <div class="progress-track">
-            <div
-              class="progress-fill"
-              style={`width: ${p.progress}%`}
-            />
-          </div>
-          <a href={`/projects/${p.slug}`}>
-            {p.title} ({p.progress}%)
-          </a>
-        </div>
-      </li>
-    ))}
+  <h2>How it's organized</h2>
+
+  <p>
+    Each section is laid out like a normal text editor. Under <strong>PROJECTS</strong> in the sidebar you'll see folders—one per project. Open a folder to find the notes for that project. Each project can contain:
+  </p>
+
+  <ul>
+    <li><strong>Notes</strong> — markdown files with my dev log entries</li>
+    <li><strong>Photos</strong> — images I drop in while building</li>
+    <li><strong>3D models</strong> — assets and references for hardware or design work</li>
   </ul>
 
-  {activeProjects.length === 0 && projects.length > 0 && (
-    <p>No active builds. <a href="/projects/chessboard">View chessboard</a>.</p>
-  )}
+  <p>
+    So if you're poking around a project, you might see a mix of text, images, and 3D viewers, depending on what I've added.
+  </p>
+
+  <h2>Work-related stuff</h2>
+
+  <p>
+    There's a separate section in the sidebar for <strong>Work</strong>—résumé, portfolio links, and other career-related info. If you're here for that, switch to the Work view in the activity bar on the left.
+  </p>
+
+  <hr />
+
+  <p>
+    <a href="/dashboard">Dashboard</a> — stats and active projects overview.
+  </p>
 </EditorLayout>

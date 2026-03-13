@@ -4,9 +4,10 @@ import { workItems } from '../lib/work';
 interface Props {
   projects: { slug: string; title: string }[];
   currentSlug?: string;
+  currentTab?: string;
 }
 
-const { projects, currentSlug } = Astro.props;
+const { projects, currentSlug, currentTab } = Astro.props;
 ---
 
 <aside class="editor-sidebar" id="editor-sidebar">
@@ -34,7 +35,17 @@ const { projects, currentSlug } = Astro.props;
         <div class="tree-section-children">
           <ul class="sidebar-file-list">
             <li>
-              <a href="/" aria-current={!currentSlug ? 'page' : undefined}>
+              <a href="/" aria-current={currentTab === 'readme.md' ? 'page' : undefined}>
+                <span class="file-icon">
+                  <svg viewBox="0 0 16 16" width="16" height="16">
+                    <path fill="#519ABA" d="M13.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L13.5 3zM13 13H3V3h3.29l.85.85.36.14H13v9z"/>
+                  </svg>
+                </span>
+                <span class="file-name">readme.md</span>
+              </a>
+            </li>
+            <li>
+              <a href="/dashboard" aria-current={currentTab === 'dashboard.md' ? 'page' : undefined}>
                 <span class="file-icon">
                   <svg viewBox="0 0 16 16" width="16" height="16">
                     <path fill="#519ABA" d="M13.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L13.5 3zM13 13H3V3h3.29l.85.85.36.14H13v9z"/>
@@ -76,6 +87,16 @@ const { projects, currentSlug } = Astro.props;
                       </svg>
                     </span>
                     <span class="file-name">images</span>
+                  </span>
+                </li>
+                <li>
+                  <span class="tree-placeholder">
+                    <span class="file-icon">
+                      <svg viewBox="0 0 16 16" width="16" height="16">
+                        <path fill="#90A4AE" d="M14.5 3H7.71l-.85-.85L6.51 2h-5l-.5.5v11l.5.5h13l.5-.5v-10L14.5 3z"/>
+                      </svg>
+                    </span>
+                    <span class="file-name">3d-models</span>
                   </span>
                 </li>
               </ul>

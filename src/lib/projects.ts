@@ -14,6 +14,7 @@ export interface Project {
   started: string;
   tags: string[];
   notes: string;
+  models: string[];
 }
 
 function getProjectDirs(): string[] {
@@ -33,6 +34,7 @@ export function loadProjects(): Project[] {
     const projectPath = path.join(PROJECTS_ROOT, dir);
     const yamlPath = path.join(projectPath, 'project.yaml');
     const notesPath = path.join(projectPath, 'notes.md');
+    const modelsDir = path.join(projectPath, '3d-models');
 
     if (!fs.existsSync(yamlPath)) continue;
 
@@ -43,6 +45,14 @@ export function loadProjects(): Project[] {
       ? fs.readFileSync(notesPath, 'utf-8')
       : '';
 
+    const models =
+      fs.existsSync(modelsDir) && fs.statSync(modelsDir).isDirectory()
+        ? fs
+            .readdirSync(modelsDir, { withFileTypes: true })
+            .filter((entry) => entry.isFile())
+            .map((entry) => entry.name)
+        : [];
+
     projects.push({
       slug: (data.slug as string) ?? dir,
       title: (data.title as string) ?? dir,
@@ -51,6 +61,7 @@ export function loadProjects(): Project[] {
       started: (data.started as string) ?? '',
       tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
       notes,
+      models,
     });
   }
 

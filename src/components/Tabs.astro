@@ -5,21 +5,127 @@ interface Props {
 }
 
 const { currentTab, projects } = Astro.props;
+const CLOSED_TABS_KEY = 'kevins-lab-closed-tabs';
 ---
 
-<div class="editor-tabs">
-  <a
-    href="/"
-    class:list={['editor-tab', { active: currentTab === 'dashboard.md' }]}
+<script is:inline>
+  (function () {
+    const key = 'kevins-lab-closed-tabs';
+    let closed = [];
+    try {
+      closed = JSON.parse(localStorage.getItem(key) || '[]');
+    } catch (_) {
+      closed = [];
+    }
+    if (!closed.length) return;
+    const style = document.createElement('style');
+    style.textContent = closed
+      .map((id) => `.editor-tab[data-tab-id="${id}"]{display:none !important;}`)
+      .join('\n');
+    document.head.appendChild(style);
+  })();
+</script>
+
+<div class="editor-tabs" id="editor-tabs">
+  <div
+    class:list={['editor-tab', { active: currentTab === 'readme.md' }]}
+    data-tab-id="readme.md"
   >
-    <span class="tab-name">dashboard.md</span>
-  </a>
-  {projects.map((p) => (
-    <a
-      href={`/projects/${p.slug}`}
-      class:list={['editor-tab', { active: currentTab === `${p.slug}.md` }]}
-    >
-      <span class="tab-name">{p.slug}.md</span>
+    <a href="/" class="tab-link">
+      <span class="tab-name">readme.md</span>
     </a>
+    <button
+      type="button"
+      class="tab-close"
+      aria-label="Close readme.md tab"
+    >
+      ×
+    </button>
+  </div>
+  <div
+    class:list={['editor-tab', { active: currentTab === 'dashboard.md' }]}
+    data-tab-id="dashboard.md"
+  >
+    <a href="/dashboard" class="tab-link">
+      <span class="tab-name">dashboard.md</span>
+    </a>
+    <button
+      type="button"
+      class="tab-close"
+      aria-label="Close dashboard.md tab"
+    >
+      ×
+    </button>
+  </div>
+  {projects.map((p) => (
+    <div
+      class:list={['editor-tab', { active: currentTab === `${p.slug}.md` }]}
+      data-tab-id={`${p.slug}.md`}
+    >
+      <a href={`/projects/${p.slug}`} class="tab-link">
+        <span class="tab-name">{p.slug}.md</span>
+      </a>
+      <button
+        type="button"
+        class="tab-close"
+        aria-label={`Close ${p.slug}.md tab`}
+      >
+        ×
+      </button>
+    </div>
   ))}
 </div>
+
+<script define:vars={{ CLOSED_TABS_KEY }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const key = CLOSED_TABS_KEY;
+    let closed = [];
+    try {
+      closed = JSON.parse(localStorage.getItem(key) || '[]');
+    } catch (_) {
+      closed = [];
+    }
+
+    const activeTab = document.querySelector('.editor-tab.active');
+    const currentId = activeTab?.getAttribute('data-tab-id');
+    if (currentId) {
+      closed = closed.filter((id) => id !== currentId);
+      try {
+        localStorage.setItem(key, JSON.stringify(closed));
+      } catch (_) {}
+    }
+
+    const tabs = document.querySelectorAll('.editor-tab');
+    tabs.forEach((tab) => {
+      const tabId = tab.getAttribute('data-tab-id');
+      if (tabId && closed.includes(tabId)) {
+        tab.classList.add('tab-closed');
+      }
+
+      const closeBtn = tab.querySelector('.tab-close');
+      closeBtn?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const id = tab.getAttribute('data-tab-id');
+        if (!id) return;
+
+        let updated = [];
+        try {
+          updated = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch (_) {}
+        if (!updated.includes(id)) updated.push(id);
+        try {
+          localStorage.setItem(key, JSON.stringify(updated));
+        } catch (_) {}
+
+        tab.classList.add('tab-closed');
+
+        if (tab.classList.contains('active')) {
+          const firstVisible = document.querySelector('.editor-tab:not(.tab-closed) .tab-link');
+          const href = firstVisible?.getAttribute('href');
+          if (href) window.location.href = href;
+        }
+      });
+    });
+  });
+</script>

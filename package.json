@@ -3,9 +3,10 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "copy-models": "node scripts/copy-3d-models.js",
+    "dev": "npm run copy-models && astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run copy-models && astro build",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -13,7 +14,8 @@
     "highlight.js": "^11.10.0",
     "js-yaml": "^4.1.0",
     "marked": "^15.0.0",
-    "node": "^22.22.1"
+    "node": "^22.22.1",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.0",

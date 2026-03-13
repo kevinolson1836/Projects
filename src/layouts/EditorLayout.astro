@@ -26,7 +26,7 @@ const { title, currentTab, projects, currentSlug } = Astro.props;
   <body>
     <div class="editor-layout">
       <ActivityBar />
-      <Sidebar projects={projects} currentSlug={currentSlug} />
+      <Sidebar projects={projects} currentSlug={currentSlug} currentTab={currentTab} />
       <main class="editor-main">
         <Tabs currentTab={currentTab} projects={projects} />
         <div class="editor-content">

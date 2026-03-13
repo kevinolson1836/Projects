@@ -28,4 +28,44 @@
   }
   setActiveView();
   window.addEventListener('hashchange', setActiveView);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const explorer = document.getElementById('activity-explorer');
+    const work = document.getElementById('activity-work');
+    const sidebar = document.getElementById('editor-sidebar');
+    const expandTab = document.getElementById('sidebar-expand-tab');
+    const STORAGE_KEY = 'kevins-lab-sidebar-collapsed';
+
+    function setCollapsed(collapsed) {
+      if (!sidebar) return;
+      sidebar.classList.toggle('collapsed', collapsed);
+      if (expandTab) expandTab.hidden = !collapsed;
+      try {
+        localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '');
+      } catch (_) {}
+    }
+
+    function isCollapsed() {
+      if (!sidebar) return false;
+      try {
+        return sidebar.classList.contains('collapsed') || localStorage.getItem(STORAGE_KEY) === '1';
+      } catch (_) {
+        return sidebar.classList.contains('collapsed');
+      }
+    }
+
+    function handleActivityClick(targetView) {
+      const currentHash = window.location.hash.slice(1) || 'explorer';
+      const currentlyCollapsed = isCollapsed();
+
+      if (currentHash === targetView) {
+        setCollapsed(!currentlyCollapsed);
+      } else if (currentlyCollapsed) {
+        setCollapsed(false);
+      }
+    }
+
+    explorer?.addEventListener('click', () => handleActivityClick('explorer'));
+    work?.addEventListener('click', () => handleActivityClick('work'));
+  });
 </script>

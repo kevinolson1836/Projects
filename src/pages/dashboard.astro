@@ -1,0 +1,54 @@
+---
+import EditorLayout from '../layouts/EditorLayout.astro';
+import { loadProjects } from '../lib/projects';
+
+const projects = loadProjects();
+const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
+
+const totalProjects = projects.length;
+const esp32Builds = projects.filter((p) => p.tags.includes('embedded') || p.tags.includes('esp32')).length;
+const pcbsDesigned = projects.filter((p) => p.tags.includes('pcb')).length;
+const activeProjects = projects.filter((p) => p.status === 'building' && p.progress > 0);
+---
+
+<EditorLayout
+  title="Dashboard — Kevin's Lab"
+  currentTab="dashboard.md"
+  projects={projectList}
+>
+  <h1>Kevin's Lab</h1>
+
+  <blockquote>
+    Embedded systems experiments and project logs
+  </blockquote>
+
+  <h2>Stats</h2>
+  <div class="stats-grid">
+    <p><strong>Projects:</strong> {totalProjects}</p>
+    <p><strong>ESP32 Builds:</strong> {esp32Builds}</p>
+    <p><strong>PCBs Designed:</strong> {pcbsDesigned}</p>
+  </div>
+
+  <h2>Active Projects</h2>
+  <ul class="project-list-dashboard">
+    {activeProjects.map((p) => (
+      <li>
+        <div class="progress-bar">
+          <div class="progress-track">
+            <div
+              class="progress-fill"
+              style={`width: ${p.progress}%`}
+            />
+          </div>
+          <a href={`/projects/${p.slug}`}>
+            {p.title} ({p.progress}%)
+          </a>
+        </div>
+      </li>
+    ))}
+  </ul>
+
+  {activeProjects.length === 0 && projects.length > 0 && (
+    <p>No active builds. <a href="/projects/chessboard">View chessboard</a>.</p>
+  )}
+</EditorLayout>
