@@ -534,11 +534,12 @@ body {
 
 .editor-content-inner {
   max-width: 800px;
+  font-size: 18px;
 }
 
 /* Markdown in editor */
 .editor-content h1 {
-  font-size: 24px;
+  font-size: 50px;
   font-weight: 600;
   margin: 0 0 16px;
   padding-bottom: 8px;
@@ -546,9 +547,13 @@ body {
 }
 
 .editor-content h2 {
-  font-size: 18px;
+  font-size: 32px;
   font-weight: 600;
-  margin: 24px 0 12px;
+  margin: 32px 0 16px;
+  padding-bottom: 8px;
+
+  border-bottom: 1px solid var(--border);
+  
 }
 
 .editor-content h3 {
@@ -701,6 +706,7 @@ body {
   gap: 12px;
   margin: 8px 0;
   font-size: 13px;
+  padding-bottom: 10px;
 }
 
 .progress-track {
@@ -724,7 +730,7 @@ body {
 }
 
 .stats-grid p {
-  margin: 0;
+  margin: 5px;
   color: var(--text-muted);
 }
 
@@ -746,3 +752,4 @@ body {
 .project-list-dashboard a:hover {
   text-decoration: underline;
 }
+

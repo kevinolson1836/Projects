@@ -8,7 +8,9 @@ const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
 const totalProjects = projects.length;
 const esp32Builds = projects.filter((p) => p.tags.includes('embedded') || p.tags.includes('esp32')).length;
 const pcbsDesigned = projects.filter((p) => p.tags.includes('pcb')).length;
+const Prints = projects.filter((p) => p.tags.includes('3d print') || p.tags.includes('3D print') || p.tags.includes('3d printing')).length;
 const activeProjects = projects.filter((p) => p.status === 'building' && p.progress > 0);
+const CompletedProjects = projects.filter((p) => p.progress === 100);
 ---
 
 <EditorLayout
@@ -16,23 +18,29 @@ const activeProjects = projects.filter((p) => p.status === 'building' && p.progr
   currentTab="dashboard.md"
   projects={projectList}
 >
-  <h1>Kevin's Lab</h1>
+  <h1>Kevin's Lab Stats</h1>
 
   <blockquote>
-    Embedded systems experiments and project logs
+    Ohhhh the interesting stuff you might find here...
   </blockquote>
 
   <h2>Stats</h2>
   <div class="stats-grid">
+  <ul>
     <p><strong>Projects:</strong> {totalProjects}</p>
     <p><strong>ESP32 Builds:</strong> {esp32Builds}</p>
     <p><strong>PCBs Designed:</strong> {pcbsDesigned}</p>
+    <p><strong>3D Prints:</strong> {Prints}</p>
+  <ul>
   </div>
 
   <h2>Active Projects</h2>
   <ul class="project-list-dashboard">
     {activeProjects.map((p) => (
       <li>
+          <a href={`/projects/${p.slug}`}>
+            {p.title} ({p.progress}%)
+          </a>
         <div class="progress-bar">
           <div class="progress-track">
             <div
@@ -40,15 +48,28 @@ const activeProjects = projects.filter((p) => p.status === 'building' && p.progr
               style={`width: ${p.progress}%`}
             />
           </div>
-          <a href={`/projects/${p.slug}`}>
-            {p.title} ({p.progress}%)
-          </a>
         </div>
       </li>
     ))}
   </ul>
-
   {activeProjects.length === 0 && projects.length > 0 && (
     <p>No active builds. <a href="/projects/chessboard">View chessboard</a>.</p>
   )}
+  
+  <br>
+
+  <h2>Completed Projects</h2>
+  <ul class="project-list-dashboard">
+    {CompletedProjects.map((p) => (
+      <li>
+          <a href={`/projects/${p.slug}`}>
+            >  {p.title}
+          </a>
+      </li>
+    ))}
+  </ul>
+  {CompletedProjects.length === 0 && projects.length > 0 && (
+    <p>No active builds. <a href="/projects/chessboard">View chessboard</a>.</p>
+  )}
+
 </EditorLayout>
