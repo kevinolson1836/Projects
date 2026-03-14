@@ -33,3 +33,7 @@
 
 --------------
 [Record model](3d-models/BASIC-RECORD.obj)
+
+
+## day 7
+- updated the base so it can better fit the battery and im going to add a on/off button so it doesnt kill the battery 
