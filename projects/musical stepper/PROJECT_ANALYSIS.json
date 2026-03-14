@@ -1,0 +1,344 @@
+{
+  "project": {
+    "name": "Arduino Teensy Musical Stepper Motor MIDI Player",
+    "platform": "Teensy",
+    "language": "C++/Arduino",
+    "purpose": "Converts MIDI file notes to stepper motor frequencies, using SD card storage for MIDI files",
+    "main_file": "code.ino"
+  },
+
+  "hardware_components": {
+    "microcontroller": {
+      "type": "Teensy",
+      "serial_baud": 115200,
+      "startup_delay_ms": 1500
+    },
+    "stepper_motor": {
+      "control_pin": {
+        "name": "STEP_PIN",
+        "pin_number": 2,
+        "function": "Toggle frequency for stepper motor step pulses",
+        "logic": "digitalWrite toggles between HIGH/LOW at calculated frequency"
+      }
+    },
+    "sd_card_interface": {
+      "chip_select_pin": "BUILTIN_SDCARD",
+      "library": "SD.h",
+      "file_format": "MIDI (.MID)",
+      "example_file": "mario-theme.MID",
+      "features": [
+        "File seeking capability",
+        "Position tracking",
+        "Size detection"
+      ]
+    },
+    "timing_hardware": {
+      "component": "IntervalTimer",
+      "purpose": "Generate precise frequency pulses for stepper motor control",
+      "isr_callback": "stepISR()",
+      "precision": "Microsecond level"
+    }
+  },
+
+  "core_architecture": {
+    "timing_approach": {
+      "type": "Interrupt-Driven ISR",
+      "function": "stepISR()",
+      "mechanism": "Toggles STEP_PIN state at interrupt intervals",
+      "code": "state = !state; digitalWrite(STEP_PIN, state);",
+      "period_calculation": "1000000 / (frequency * 2) microseconds",
+      "factor_of_2": "Each toggle is half period, so *2 in denominator"
+    },
+    "frequency_generation": {
+      "source": "MIDI note numbers (0-127)",
+      "conversion": "Musical note to Hz to motor-safe frequency",
+      "function": "noteToFreq(byte note)",
+      "algorithm": [
+        "1. Standard piano: 440 * 2^((note - 69) / 12.0) Hz",
+        "2. Apply 0.12 scaling factor (stepper safety)",
+        "3. Clamp to [30, 400] Hz range"
+      ]
+    },
+    "midi_parsing": {
+      "strategy": "Event-based sequential parsing",
+      "running_status": {
+        "enabled": true,
+        "description": "If byte < 0x80, reuse lastStatus byte",
+        "purpose": "MIDI format efficiency - avoids redundant status bytes",
+        "implementation": "lastStatus tracking, seek-back if needed"
+      },
+      "variable_length": {
+        "function": "readVar()",
+        "format": "MIDI standard variable-length quantities",
+        "algorithm": "Accumulate 7-bit chunks, continue while MSB set",
+        "usage": [
+          "Delta time between events",
+          "Meta event data lengths"
+        ]
+      }
+    },
+    "state_management": {
+      "lastStatus": "Tracks previous MIDI status byte for running status",
+      "state": "volatile bool for ISR STEP_PIN state",
+      "timer": "IntervalTimer object, global scope for control"
+    }
+  },
+
+  "hardware_timing_constraints": {
+    "frequency_bounds": {
+      "minimum_hz": 30,
+      "maximum_hz": 400,
+      "reason": "Stepper motor safe operating range - avoids stalling and excessive speed"
+    },
+    "timer_period_microseconds": "1000000 / (freq * 2)",
+    "note_duration_calculation": {
+      "formula": "delta_ticks * 60000 / division / bpm",
+      "hardcoded_bpm": 105,
+      "note_example": "480 ticks (quarter note) at 105 BPM = ~571ms"
+    },
+    "minimum_note_duration_ms": 5,
+    "isr_frequency": "Depends on MIDI note; toggles STEP_PIN at 30-400 times per second"
+  },
+
+  "midi_format_handling": {
+    "standard": "SMF (Standard MIDI File)",
+    "header": {
+      "id": "MThd (4 bytes)",
+      "header_length": "6 bytes (big-endian uint32)",
+      "format_type": "2 bytes (read but not validated)",
+      "track_count": "2 bytes (read but not validated)",
+      "division": "2 bytes (ticks per quarter note, big-endian uint16)"
+    },
+    "track": {
+      "id": "MTrk (4 bytes)",
+      "track_length": "4 bytes (big-endian uint32)",
+      "data": "Event stream"
+    },
+    "event_structure": {
+      "delta_time": "Variable-length quantity (readVar())",
+      "status_byte": "0x80-0xFF, may use running status",
+      "data_bytes": "1-2 bytes depending on message type"
+    },
+    "supported_messages": {
+      "note_on": {
+        "status": "0x90 + channel (lower 4 bits masked with 0xF0)",
+        "data_bytes": [
+          "note number (0-127)",
+          "velocity (0-127, where 0 means note off)"
+        ]
+      },
+      "note_off": {
+        "status": "0x80 + channel",
+        "data_bytes": [
+          "note number",
+          "velocity (ignored)"
+        ]
+      },
+      "meta_events": {
+        "status": "0xFF",
+        "subtypes": {
+          "set_tempo": {
+            "type": 0x51,
+            "data_length": 3,
+            "description": "Tempo in microseconds per beat",
+            "parsed_but_not_used": true
+          },
+          "other_meta": "Read and skip (length determined by readVar())"
+        }
+      }
+    },
+    "running_status": {
+      "description": "If status byte < 0x80, reuse last status",
+      "implementation": "seek() back one byte when detected",
+      "purpose": "Compress MIDI file size"
+    },
+    "unsupported": [
+      "MIDI control changes",
+      "Pitch bend",
+      "Polyphony (only plays one note at a time)",
+      "Tempo changes are parsed but not applied"
+    ]
+  },
+
+  "critical_libraries_peripherals": {
+    "sd_library": {
+      "name": "SD.h",
+      "platform": "Arduino/Teensy standard",
+      "functions_used": [
+        "SD.begin(CS_PIN)",
+        "SD.open(filename)",
+        "File.read() - single byte",
+        "File.read(buffer, length) - bulk read",
+        "File.seek(position)",
+        "File.position()",
+        "File.size()",
+        "File.available()"
+      ]
+    },
+    "interval_timer": {
+      "name": "IntervalTimer",
+      "type": "Teensy-specific hardware timer",
+      "functions_used": [
+        "timer.begin(callback, period_us)",
+        "timer.end()"
+      ],
+      "precision": "Microsecond level",
+      "callback": "stepISR()"
+    },
+    "serial_communication": {
+      "library": "Serial (built-in)",
+      "baud_rate": 115200,
+      "purpose": "Debug logging and status reporting",
+      "key_outputs": [
+        "Startup confirmations (START, SD OK, FILE OK)",
+        "MIDI events (NOTE ON/OFF, meta events)",
+        "Frequency calculations",
+        "Delta times and note durations"
+      ]
+    },
+    "gpio": {
+      "function": "digitalWrite() for STEP_PIN control",
+      "timing_critical": true,
+      "volatile_operations": "stepISR() executes asynchronously from main loop"
+    }
+  },
+
+  "typical_workflow": {
+    "initialization": [
+      "1. Serial.begin(115200) and startup delay",
+      "2. pinMode(STEP_PIN, OUTPUT)",
+      "3. SD.begin(SD_CS) - initialize SD card",
+      "4. SD.open('mario-theme.MID') - open MIDI file"
+    ],
+    "header_parsing": [
+      "1. Read 'MThd' identifier (4 bytes)",
+      "2. Skip header length and format/track fields",
+      "3. Extract division (ticks per quarter note) - typically 480"
+    ],
+    "track_location": [
+      "1. Scan through file looking for 'MTrk' identifier",
+      "2. Read track length (variable, could span multiple tracks)",
+      "3. Break after finding first track (ignores subsequent tracks)"
+    ],
+    "event_loop": [
+      "1. Read delta time (readVar()) - ticks since last event",
+      "2. Convert delta to milliseconds using division and hardcoded 105 BPM",
+      "3. Read status byte (or use running status)",
+      "4. Execute event (note on/off, meta event, etc.)",
+      "5. For NOTE ON: convert to frequency, start motor, delay, stop motor",
+      "6. Continue until file exhausted"
+    ],
+    "motor_control": [
+      "1. noteToFreq(note) converts MIDI note to safe stepper frequency",
+      "2. play(freq) starts IntervalTimer with calculated period",
+      "3. ISR toggles STEP_PIN at the frequency",
+      "4. play(0) stops the motor after note duration"
+    ]
+  },
+
+  "calibration_values": {
+    "note_scaling_factor": {
+      "value": 0.12,
+      "purpose": "Converts MIDI note frequencies to stepper-safe speeds",
+      "effect": "A4 (440 Hz) becomes 52.8 Hz after scaling"
+    },
+    "frequency_bounds": {
+      "minimum_hz": 30,
+      "maximum_hz": 400,
+      "description": "Hardware safety limits for stepper motor operation"
+    },
+    "bpm_hardcoded": {
+      "value": 105,
+      "usage": "note_duration = delta_ticks * 60000 / division / 105",
+      "note": "Tempo meta-events are parsed but not applied (hardcoded BPM overrides)"
+    },
+    "tempo_default": {
+      "value": 500000,
+      "unit": "microseconds per beat",
+      "bpm_equivalent": 120,
+      "usage": "Stored in tempo variable but not actually used in timing"
+    },
+    "division_default": {
+      "value": 480,
+      "unit": "ticks per quarter note",
+      "standard": "Common MIDI standard, overridden by file header"
+    },
+    "minimum_note_duration": {
+      "value": 5,
+      "unit": "milliseconds",
+      "purpose": "Prevents timer from being set with too-small periods"
+    }
+  },
+
+  "code_flow_example": {
+    "scenario": "Playing Mario theme quarter note A4 (note 69)",
+    "steps": [
+      {
+        "step": 1,
+        "action": "readVar() returns delta_ticks = 480",
+        "detail": "Quarter note (480 ticks)"
+      },
+      {
+        "step": 2,
+        "action": "noteDuration = 480 * 60000 / 480 / 105 ≈ 571 ms"
+      },
+      {
+        "step": 3,
+        "action": "Read status 0x90, note 69, velocity 100",
+        "detail": "NOTE ON"
+      },
+      {
+        "step": 4,
+        "action": "noteToFreq(69)",
+        "detail": "440 * 2^((69-69)/12) * 0.12 = 52.8 Hz"
+      },
+      {
+        "step": 5,
+        "action": "play(52.8) starts IntervalTimer",
+        "detail": "Period = 1000000 / (52.8 * 2) ≈ 9468 microseconds"
+      },
+      {
+        "step": 6,
+        "action": "stepISR() toggles STEP_PIN ~52.8 times/second",
+        "detail": "Motor pulses while delay(571) executes"
+      },
+      {
+        "step": 7,
+        "action": "play(0) stops the motor",
+        "detail": "timer.end() called"
+      }
+    ]
+  },
+
+  "known_limitations": [
+    "Only plays monophonic (single note) music",
+    "Tempo changes in MIDI are parsed but ignored; 105 BPM is hardcoded",
+    "Only processes first track in multi-track MIDI files",
+    "No polyphonic support (would require multiple timers)",
+    "Velocity information is read but not used (no dynamic speed control)",
+    "No sustain or release handling",
+    "Assumes A4=69 standard MIDI note numbering"
+  ],
+
+  "debug_output_examples": [
+    "START - Initial Serial confirmation",
+    "SD OK - SD card initialized successfully",
+    "FILE OK - mario-theme.MID opened",
+    "DIV=480 - Division extracted from header",
+    "TRACK FOUND - First MTrk located",
+    "Delta ticks: 480 - Time delta read",
+    "Note duration (ms): 571 - Calculated play duration",
+    "NOTE ON: 69 vel=100 - MIDI event interpreted",
+    "Motor ON, freq=52 - Stepper motor started",
+    "Motor OFF - Stepper motor stopped"
+  ],
+
+  "development_notes": {
+    "note_to_freq_formula": "MIDI standard: f(n) = 440 * 2^((n-69)/12), where n=69 is A4",
+    "stepper_scaling": "0.12 factor empirically determined for this stepper motor to avoid stalling",
+    "running_status_safety": "seek() called when detected, which handles file position correctly",
+    "isr_volatile_state": "volatile keyword necessary for ISR access to state variable",
+    "frequency_period": "Microsecond period divided by 2 because ISR toggles (both edges count)",
+    "timing_precision": "IntervalTimer provides microsecond precision for accurate frequencies"
+  }
+}
