@@ -4,9 +4,10 @@
   "version": "0.0.1",
   "scripts": {
     "copy-models": "node scripts/copy-3d-models.js",
-    "dev": "npm run copy-models && astro dev",
+    "copy-images": "node scripts/copy-images.js",
+    "dev": "npm run copy-models && npm run copy-images && astro dev",
     "start": "astro dev",
-    "build": "npm run copy-models && astro build",
+    "build": "npm run copy-models && npm run copy-images && astro build",
     "preview": "astro preview"
   },
   "dependencies": {

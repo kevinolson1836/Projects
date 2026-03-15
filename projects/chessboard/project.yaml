@@ -1,9 +1,12 @@
 slug: chessboard
 title: Modular RGB Chessboard
-status: building
-progress: 55
+status: on hold
+progress: 20
 started: 2024-05-29
 tags:
   - pcb
-  - embedded
   - chess
+  - 3D printing
+  - modular
+  - acrylic
+  - magnets
