@@ -1,0 +1,38 @@
+slug: TODO
+title: TODO
+status: TODO
+progress: -1
+started: 2024-07-10
+tags:
+  - Custom Speaker:
+
+  - Cyclodial Drive:
+
+  - desk:
+    - Find a cheaper way to make the desk but keep the hexagon design
+  
+  - Hexagon Lights:
+    - redesign PCB to use a normal esp32 instead of the esp32c3 super mini (the wireless range is terrible)
+
+  - Lithophrame:
+
+  - chessboard:
+
+  - Mousepad:
+  
+  - Musical Stepper:
+    - make a better enclosure for the stepper and the electronics
+    - play more with the code to make it easier for me to add new songs
+  
+  - jukebox:  
+    - Print off the rest of the disc's
+
+  - Stop Light: 
+
+  - Topographic City: 
+
+  - Website V3:
+    - finish the write ups for the projects
+    - do the work section
+    - auto collapse side bar when on mobile and improve the mobile experience
+    - do more on the stats section of the dashboard

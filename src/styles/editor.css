@@ -753,3 +753,10 @@ body {
   text-decoration: underline;
 }
 
+.todo-grid p{
+    color: var(--accent);
+}
+
+.todo-grid ul{
+    color: var(--text-muted);
+}

@@ -11,6 +11,10 @@ const pcbsDesigned = projects.filter((p) => p.tags.includes('pcb')).length;
 const Prints = projects.filter((p) => p.tags.includes('3d print') || p.tags.includes('3D print') || p.tags.includes('3d printing')).length;
 const activeProjects = projects.filter((p) => p.status === 'building' && p.progress > 0);
 const CompletedProjects = projects.filter((p) => p.progress === 100);
+
+const TODO = projects.filter((p) => p.status === 'todo' || p.status === 'TODO');
+const TODOTAGS = TODO.filter((p) => p.tags.length > 0).flatMap((p) => p.tags);
+console.log('TODO Projects:', TODOTAGS);
 ---
 
 <EditorLayout
@@ -32,6 +36,30 @@ const CompletedProjects = projects.filter((p) => p.progress === 100);
     <p><strong>PCBs Designed:</strong> {pcbsDesigned}</p>
     <p><strong>3D Prints:</strong> {Prints}</p>
   <ul>
+  </div>
+
+  <div class="todo-grid">
+    <h2>TODO</h2>
+    {TODOTAGS.filter((item) => {
+    const tags = Object.values(item)[0];
+    return tags && tags.length > 0;
+  }).sort((a, b) => {
+    const aKey = Object.keys(a)[0];
+    const bKey = Object.keys(b)[0];
+    return aKey.localeCompare(bKey);
+  }).map((item) => {
+      const [title, tags] = Object.entries(item)[0];
+
+      return (
+        <div>
+          <p><a href={`/projects/${title}`}><strong>{title}</strong></a></p>
+
+          {tags.map((tag) => (
+            <ul>{tag}</ul>
+          ))}
+        </div>
+      );
+    })}
   </div>
 
   <h2>Active Projects</h2>

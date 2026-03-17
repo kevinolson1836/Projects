@@ -37,3 +37,13 @@
 
 ## day 7
 - updated the base so it can better fit the battery and im going to add a on/off button so it doesnt kill the battery 
+
+## day 8
+- I did not like the way i made it so i will remake it again so the battery is easier to take out and replace
+
+- I made it so the button and the battery and now glued into the bottom so it remains bottom heavy and its easier to open up and tinker with things as needed. also made the lid bigger so the disks can fit in better
+
+## Day 9
+- made the other music disks from my 5 favorate songs, the next thing I want to do with this project is to make a chest that will store the extra music disc's. I have not designed my own hinge before so I think that will be a fun challage to learn how to make one, I have some general ideas on how I want to make one I think but until I get into CAD idk if it will work correctly. 
+
+-  The chest doesn't seem to hard to design, It would be nice if I can make it modular so it can ether be a single chest or a double chest, but that might add a lot to the complexity, I do have some ideas on how to do it but as before, idk until I get into CAD and start playing around
