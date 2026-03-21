@@ -28,6 +28,11 @@ String C13B = "53A7475D220001";
 String C13C = "5326D15D220001";
 String C13D = "53653C5D220001";
 
+String STRADA = "53E94E5D220001";
+String STRADB = "53F9B75D220001";
+String STRADC = "5323C95D220001";
+String STRADD = "533DC35D220001";
+
 // ===== WEB SERVER =====
 WiFiServer server(80);
 
@@ -106,33 +111,33 @@ void setup() {
   // ===== WIFI =====
   Serial.println("\nConnecting to WiFi...");
 
-  WiFi.begin(ssid, password);
+  // WiFi.begin(ssid, password);
 
   int timeout = 20;
 
-  while (WiFi.status() != WL_CONNECTED && timeout--) {
-    delay(500);
-    Serial.print(".");
-  }
+  // while (WiFi.status() != WL_CONNECTED && timeout--) {
+  //   delay(500);
+  //   Serial.print(".");
+  // }
 
-  if (WiFi.isConnected()) {
+  // if (WiFi.isConnected()) {
 
-    Serial.println("\n✅ WiFi connected");
-    Serial.print("IP: ");
-    Serial.println(WiFi.localIP());
+  //   Serial.println("\n✅ WiFi connected");
+  //   Serial.print("IP: ");
+  //   Serial.println(WiFi.localIP());
 
-  } else {
+  // } else {
 
-    Serial.println("\n⚠ WiFi failed — starting AP");
+  //   Serial.println("\n⚠ WiFi failed — starting AP");
 
-    WiFi.softAP("Jukebox", "12345678");
+  //   WiFi.softAP("Jukebox", "12345678");
 
-    Serial.print("AP IP: ");
-    Serial.println(WiFi.softAPIP());
-  }
+  //   Serial.print("AP IP: ");
+  //   Serial.println(WiFi.softAPIP());
+  // }
 
-  server.begin();
-  Serial.println("Web server started");
+  // server.begin();
+  // Serial.println("Web server started");
 
   Serial.println("\nSYSTEM READY");
 }
@@ -202,6 +207,13 @@ void loop() {
       dfplayer.play(1);
 
     } 
+    else if (tagID == STRADA || tagID == STRADB || tagID == STRADC || tagID == STRADD) {
+
+      Serial.println("MATCHED TAG → Playing C13 (YELLOW DISK)");
+      dfplayer.play(5);
+
+    } 
+
     // else if (tagID == knownTag2) {
 
     //   Serial.println("MATCHED TAG → Playing Track 3");
@@ -219,67 +231,67 @@ void loop() {
   }
 
   // ===== WEB SERVER =====
-  WiFiClient client = server.available();
+//   WiFiClient client = server.available();
 
-  if (client) {
+//   if (client) {
 
-    Serial.println("Web client connected");
+//     Serial.println("Web client connected");
 
-    String request = client.readStringUntil('\r');
-    client.readStringUntil('\n');
+//     String request = client.readStringUntil('\r');
+//     client.readStringUntil('\n');
 
-    Serial.print("HTTP Request: ");
-    Serial.println(request);
+//     Serial.print("HTTP Request: ");
+//     Serial.println(request);
 
-    if (request.indexOf("/play") != -1) dfplayer.start();
-    if (request.indexOf("/pause") != -1) dfplayer.pause();
-    if (request.indexOf("/next") != -1) dfplayer.next();
-    if (request.indexOf("/prev") != -1) dfplayer.previous();
+//     if (request.indexOf("/play") != -1) dfplayer.start();
+//     if (request.indexOf("/pause") != -1) dfplayer.pause();
+//     if (request.indexOf("/next") != -1) dfplayer.next();
+//     if (request.indexOf("/prev") != -1) dfplayer.previous();
 
-    if (request.indexOf("/volup") != -1) {
+//     if (request.indexOf("/volup") != -1) {
 
-      if (volumeLevel < 30) volumeLevel++;
-      dfplayer.volume(volumeLevel);
-    }
+//       if (volumeLevel < 30) volumeLevel++;
+//       dfplayer.volume(volumeLevel);
+//     }
 
-    if (request.indexOf("/voldown") != -1) {
+//     if (request.indexOf("/voldown") != -1) {
 
-      if (volumeLevel > 0) volumeLevel--;
-      dfplayer.volume(volumeLevel);
-    }
+//       if (volumeLevel > 0) volumeLevel--;
+//       dfplayer.volume(volumeLevel);
+//     }
 
-    while (client.available()) {
-      client.read();
-    }
+//     while (client.available()) {
+//       client.read();
+//     }
 
-    String html = R"(
-<!DOCTYPE html>
-<html>
-<head>
-<title>ESP32 Jukebox</title>
-<style>
-body{font-family:Arial;background:#222;color:white;text-align:center;}
-button{font-size:28px;padding:20px;margin:10px;width:150px;}
-</style>
-</head>
-<body>
-<h1>ESP32 Jukebox</h1>
-<button onclick="location.href='/play'">PLAY</button>
-<button onclick="location.href='/pause'">PAUSE</button>
-<br>
-<button onclick="location.href='/prev'">PREV</button>
-<button onclick="location.href='/next'">NEXT</button>
-<br>
-<button onclick="location.href='/voldown'">VOL -</button>
-<button onclick="location.href='/volup'">VOL +</button>
-</body>
-</html>
-)";
+//     String html = R"(
+// <!DOCTYPE html>
+// <html>
+// <head>
+// <title>ESP32 Jukebox</title>
+// <style>
+// body{font-family:Arial;background:#222;color:white;text-align:center;}
+// button{font-size:28px;padding:20px;margin:10px;width:150px;}
+// </style>
+// </head>
+// <body>
+// <h1>ESP32 Jukebox</h1>
+// <button onclick="location.href='/play'">PLAY</button>
+// <button onclick="location.href='/pause'">PAUSE</button>
+// <br>
+// <button onclick="location.href='/prev'">PREV</button>
+// <button onclick="location.href='/next'">NEXT</button>
+// <br>
+// <button onclick="location.href='/voldown'">VOL -</button>
+// <button onclick="location.href='/volup'">VOL +</button>
+// </body>
+// </html>
+// )";
 
-    client.print("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
-    client.print(html);
-    client.stop();
-  }
+//     client.print("HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
+//     client.print(html);
+//     client.stop();
+//   }
 }
 
 void printDFStatus(uint8_t type, int value) {
