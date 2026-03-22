@@ -1,0 +1,41 @@
+---
+import EditorLayout from '../../layouts/EditorLayout.astro';
+import { loadWork } from '../../lib/work';
+import { loadProjects } from '../../lib/projects';
+import { renderMarkdown } from '../../lib/markdown';
+import ModelViewerInit from '../../components/ModelViewerInit.astro';
+
+const workEntries = loadWork();
+const work = workEntries[0];
+
+const projects = loadProjects();
+const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
+
+const notesHtml = work ? renderMarkdown(work.notes, `/images/${work.slug}/`, work.slug) : '';
+---
+
+<EditorLayout
+  title={work?.title ?? 'Work'}
+  currentTab="work.md"
+  projects={projectList}
+  currentSlug={work?.slug}
+>
+  {work ? (
+    <>
+      <h1>{work.title}</h1>
+
+      <p>
+        <strong>Status:</strong> {work.status}
+        {Number(work.progress) !== -1 && <><br /><strong>Progress:</strong> {work.progress}%</>}
+      </p>
+
+      <br>
+      <br>
+      <Fragment set:html={notesHtml} />
+
+      <ModelViewerInit />
+    </>
+  ) : (
+    <p>No work found.</p>
+  )}
+</EditorLayout>

@@ -1,20 +1,21 @@
 ---
 import EditorLayout from '../../layouts/EditorLayout.astro';
 import { loadWork } from '../../lib/work';
+import { loadProjects } from '../../lib/projects';
 import { renderMarkdown } from '../../lib/markdown';
 import ModelViewerInit from '../../components/ModelViewerInit.astro';
 
 export function getStaticPaths() {
-  const work = loadWork();
-  return work.map((w) => ({
+  const workItems = loadWork();
+  return workItems.map((w) => ({
     params: { slug: w.slug },
     props: { work: w },
   }));
 }
 
 const { work } = Astro.props;
-const works = loadWork();
-const workList = works.map((w) => ({ slug: w.slug, title: w.title }));
+const projects = loadProjects();
+const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
 
 const notesHtml = renderMarkdown(work.notes, `/images/${work.slug}/`, work.slug);
 ---
@@ -22,17 +23,17 @@ const notesHtml = renderMarkdown(work.notes, `/images/${work.slug}/`, work.slug)
 <EditorLayout
   title={work.title}
   currentTab={`${work.slug}.md`}
-  projects={workList}
+  projects={projectList}
   currentSlug={work.slug}
 >
   <h1>{work.title}</h1>
 
   <p>
-    <strong>Status:</strong> {work.status}<br />
-    <strong>Progress:</strong> {work.progress}%
+    <strong>Status:</strong> {work.status}
+    {work.progress >= -1 && <><br /><strong>Progress:</strong> {work.progress}%</>}
   </p>
 
-  <h2>Build Log</h2>
+  <h2>Notes</h2>
   <Fragment set:html={notesHtml} />
 
   <ModelViewerInit />

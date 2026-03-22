@@ -530,6 +530,7 @@ body {
   overflow: auto;
   padding: 16px 24px;
   background: var(--editor-bg);
+  padding-bottom: 30vh;
 }
 
 .editor-content-inner {
@@ -549,17 +550,17 @@ body {
 .editor-content h2 {
   font-size: 32px;
   font-weight: 600;
-  margin: 32px 0 16px;
-  padding-bottom: 8px;
+  /* margin: 32px 0 16px; */
+  /* padding-bottom: 8px; */
 
-  border-bottom: 1px solid var(--border);
+  /* border-bottom: 1px solid var(--border); */
   
 }
 
 .editor-content h3 {
   font-size: 14px;
   font-weight: 600;
-  margin: 16px 0 8px;
+  margin: -3% 0 3% 0;
 }
 
 .editor-content p {
@@ -759,4 +760,62 @@ body {
 
 .todo-grid ul{
     color: var(--text-muted);
+}
+
+
+.tabs-close-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  height: 100%;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--tab-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tabs-close-all:hover {
+  color: var(--text);
+  background: var(--tab-hover-bg);
+}
+
+/* ========== Project footer ========== */
+.project-footer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.footer-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.15s ease;
+}
+
+.footer-link:hover {
+  color: var(--accent);
+}
+
+.footer-link svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.footer-link:hover svg {
+  opacity: 1;
+}
+
+.spacer{
+  padding-top: 1vh;
+  padding-bottom: 20%;
 }

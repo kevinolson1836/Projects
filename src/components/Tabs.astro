@@ -27,6 +27,17 @@ const CLOSED_TABS_KEY = 'kevins-lab-closed-tabs';
 </script>
 
 <div class="editor-tabs" id="editor-tabs">
+  <button
+    type="button"
+    class="tabs-close-all"
+    id="tabs-close-all"
+    title="Close all tabs"
+    aria-label="Close all tabs"
+  >
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+      <path d="M7.116 8 1 1.884 1.884 1 8 7.116 14.116 1 15 1.884 8.884 8 15 14.116 14.116 15 8 8.884 1.884 15 1 14.116z"/>
+    </svg>
+  </button>
   <div
     class:list={['editor-tab', { active: currentTab === 'readme.md' }]}
     data-tab-id="readme.md"
@@ -94,6 +105,21 @@ const CLOSED_TABS_KEY = 'kevins-lab-closed-tabs';
         localStorage.setItem(key, JSON.stringify(closed));
       } catch (_) {}
     }
+
+    const closeAllBtn = document.getElementById('tabs-close-all');
+    closeAllBtn?.addEventListener('click', () => {
+      const allTabs = document.querySelectorAll('.editor-tab');
+      const updated = [];
+      allTabs.forEach((tab) => {
+        const id = tab.getAttribute('data-tab-id');
+        if (id) updated.push(id);
+        tab.classList.add('tab-closed');
+      });
+      try {
+        localStorage.setItem(key, JSON.stringify(updated));
+      } catch (_) {}
+      window.location.href = '/';
+    });
 
     const tabs = document.querySelectorAll('.editor-tab');
     tabs.forEach((tab) => {

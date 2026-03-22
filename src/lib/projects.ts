@@ -22,7 +22,7 @@ function getProjectDirs(): string[] {
     return [];
   }
   return fs.readdirSync(PROJECTS_ROOT, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
+    .filter((d) => d.isDirectory() && d.name !== 'EXAMPLE' && d.name !== 'work')
     .map((d) => d.name);
 }
 
