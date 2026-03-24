@@ -242,7 +242,7 @@ body {
   flex: 1;
   overflow: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
 }
 
 /* Sidebar panels: show one based on data-active */
@@ -283,6 +283,7 @@ body {
 
 .tree-project-summary:hover {
   background: var(--list-hover-bg);
+  transform: scale(1.1);
 }
 
 .tree-project-summary .chevron {
@@ -307,11 +308,17 @@ body {
 
 .tree-project .sidebar-file-list {
   padding-left: 0;
+  
 }
 
 .tree-project .sidebar-file-list a {
   padding-left: 44px;
 }
+
+.tree-project .sidebar-file-list a:hover {
+  transform: scale(1.1);
+}
+
 
 .tree-project .tree-placeholder {
   padding-left: 44px;

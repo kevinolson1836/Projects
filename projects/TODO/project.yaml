@@ -37,3 +37,8 @@ tags:
     - auto collapse side bar when on mobile and improve the mobile experience
     - do more on the stats section of the dashboard
     - add color to 3d models on the project pages
+    - add a section for my resume and make it look nice
+    - in the ideas tab, make it so the ideas auto populate in the side bar section
+    - would be nice to filter projects by tag and have a search function for the projects
+    - add a interactive timeline to the about page that shows the projects and important life events in chronological order
+    - add a way for me and only me to edit the MD file live and have it push to github and update the site in real time without me having to manually edit the MD file and push it to github every time I want to add a new project or update an old one

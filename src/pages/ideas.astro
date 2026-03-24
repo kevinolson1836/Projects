@@ -305,15 +305,17 @@ const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
         : '';
       return `
         <div class="idea-card">
-          <div class="idea-card-title">
-            <span>${esc(idea.title)}</span>
-            ${isOwner ? `<button class="idea-delete" data-id="${idea.id}" title="Delete">✕</button>` : ''}
-          </div>
-          ${idea.description ? `<div class="idea-card-body">${esc(idea.description)}</div>` : ''}
-          <div class="idea-card-footer">
-            <span class="idea-tag tag-${idea.tag}">${idea.tag}</span>
-            <span class="idea-date">${date}</span>
-          </div>
+            <blockquote>
+                ${isOwner ? `<button class="idea-delete" data-id="${idea.id}" title="Delete">Delete: ${esc(idea.title)}</button>` : ''}
+                <div class="idea-card-title">
+                    <h2>${esc(idea.title)}</h2>
+                    <h3 class="idea-date">${date}</h3>
+                </div>
+                ${idea.description ? `<div class="idea-card-body">${esc(idea.description)}</div>` : ''}
+                <div class="idea-card-footer">
+                    <span class="idea-tag tag-${idea.tag}"></span>
+                </div>
+            </blockquote>
         </div>`;
     }).join('')}</div>`;
 
