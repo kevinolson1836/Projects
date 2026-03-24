@@ -1,5 +1,5 @@
 ---
-// Explorer + Work views; active state set by client via hash
+// Explorer + Work + Ideas views; active state set by client via path
 ---
 
 <div class="activity-bar" id="activity-bar">
@@ -8,26 +8,43 @@
       <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4zM6 20V4h5v5h5v11H6z"/>
     </svg>
   </a>
+
   <a href="/work" class="activity-bar-item" id="activity-work" title="Work">
     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="2" y="7" width="20" height="14" rx="2"/>
       <path d="M16 7V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v3"/>
     </svg>
   </a>
+
+  <a href="/ideas" class="activity-bar-item" id="activity-ideas" title="Ideas">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18h6"/>
+      <path d="M10 22h4"/>
+      <path d="M12 2a7 7 0 0 0-4 12c.5.5 1 1.5 1 2h6c0-.5.5-1.5 1-2a7 7 0 0 0-4-12z"/>
+    </svg>
+  </a>
 </div>
 
 <script>
   function getActiveView() {
-    return window.location.pathname.startsWith('/work') ? 'work' : 'explorer';
+    const path = window.location.pathname;
+    if (path.startsWith('/work')) return 'work';
+    if (path.startsWith('/ideas')) return 'ideas';
+    return 'explorer';
   }
 
   function setActiveView() {
     const view = getActiveView();
+
     const explorer = document.getElementById('activity-explorer');
     const work = document.getElementById('activity-work');
+    const ideas = document.getElementById('activity-ideas');
     const sidebar = document.getElementById('sidebar-panels');
-    if (explorer) explorer.classList.toggle('active', view === 'explorer');
-    if (work) work.classList.toggle('active', view === 'work');
+
+    explorer?.classList.toggle('active', view === 'explorer');
+    work?.classList.toggle('active', view === 'work');
+    ideas?.classList.toggle('active', view === 'ideas');
+
     if (sidebar) sidebar.dataset.active = view;
   }
 
@@ -36,6 +53,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     const explorer = document.getElementById('activity-explorer');
     const work = document.getElementById('activity-work');
+    const ideas = document.getElementById('activity-ideas'); // ✅ FIXED
+
     const sidebar = document.getElementById('editor-sidebar');
     const expandTab = document.getElementById('sidebar-expand-tab');
     const STORAGE_KEY = 'kevins-lab-sidebar-collapsed';
@@ -72,5 +91,6 @@
 
     explorer?.addEventListener('click', (e) => handleActivityClick(e, 'explorer'));
     work?.addEventListener('click', (e) => handleActivityClick(e, 'work'));
+    ideas?.addEventListener('click', (e) => handleActivityClick(e, 'ideas')); // ✅ now works
   });
 </script>

@@ -1,0 +1,334 @@
+---
+import EditorLayout from '../layouts/EditorLayout.astro';
+import { loadProjects } from '../lib/projects';
+
+const projects = loadProjects();
+const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
+---
+
+<EditorLayout
+  title="Ideas"
+  currentTab="ideas.md"
+  projects={projectList}
+>
+
+  <h1>Ideas & Future Projects</h1>
+
+  <blockquote>
+    A running list of things I want to build someday.
+  </blockquote>
+
+  <!-- Auth controls -->
+  <div id="auth-bar" style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+    <button id="sign-in-btn" style="display:none">Sign in with Google to add ideas</button>
+    <span id="status-user"></span>
+    <button id="sign-out-btn" style="display:none">Sign out</button>
+  </div>
+
+  <!-- New idea button (owner only) -->
+  <button id="new-idea-btn" style="display:none">＋ New Idea</button>
+  <div id="new-idea-btn2" style="display:none">Nice try... you can't add ideas, you are not me! But please look around or email me at <a href="mailto:kevin.olson1836@gmail.com">kevin.olson1836@gmail.com</a> for suggestions! :)</div>
+  <br>
+  <br>
+  <!-- Add idea form -->
+  <div id="add-form" style="display:none">
+    <div class="idea-form-row">
+      <label class="idea-label">Title</label>
+      <input id="idea-title" class="idea-input" type="text" placeholder="What's the idea?" />
+    </div>
+    <div class="idea-form-row">
+      <label class="idea-label">Description</label>
+      <textarea id="idea-desc" class="idea-input idea-textarea" placeholder="How would it work? What problem does it solve?"></textarea>
+    </div>
+    <div class="idea-form-row">
+      <label class="idea-label">Tag</label>
+      <div id="tag-select" class="idea-tags">
+        <button class="tag-opt selected" data-tag="idea">idea</button>
+        <button class="tag-opt" data-tag="hardware">hardware</button>
+        <button class="tag-opt" data-tag="software">software</button>
+        <button class="tag-opt" data-tag="research">research</button>
+        <button class="tag-opt" data-tag="other">other</button>
+      </div>
+    </div>
+    <div class="idea-form-actions">
+      <button id="submit-idea-btn">Add Idea</button>
+      <button id="cancel-idea-btn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Ideas grid -->
+  <div id="ideas-container">
+    <p style="color: var(--text-muted)">Loading ideas...</p>
+  </div>
+
+</EditorLayout>
+
+<style>
+  #auth-bar { font-size: 13px; color: var(--text-muted); }
+
+  #sign-in-btn, #sign-out-btn, #new-idea-btn,
+  #submit-idea-btn, #cancel-idea-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    border-radius: 2px;
+    cursor: pointer;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    transition: background 0.1s, border-color 0.1s;
+  }
+  #sign-in-btn:hover, #new-idea-btn:hover { background: var(--list-hover-bg); border-color: var(--accent); }
+  #sign-out-btn:hover, #cancel-idea-btn:hover { background: var(--list-hover-bg); }
+  #submit-idea-btn { border-color: var(--tab-active-border); color: var(--accent); }
+  #submit-idea-btn:hover { background: var(--list-hover-bg); }
+
+  #new-idea-btn {
+    margin-bottom: 20px;
+    border-style: dashed;
+    color: var(--text-muted);
+  }
+  #new-idea-btn:hover { color: var(--accent); border-color: var(--tab-active-border); }
+
+  #add-form {
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px;
+    margin-bottom: 24px;
+  }
+  .idea-form-row { margin-bottom: 12px; }
+  .idea-label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+  .idea-input {
+    width: 100%;
+    background: var(--editor-bg);
+    border: 1px solid var(--border);
+    color: var(--editor-fg);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 6px 10px;
+    border-radius: 2px;
+    outline: none;
+  }
+  .idea-input:focus { border-color: var(--tab-active-border); }
+  .idea-textarea { resize: vertical; min-height: 72px; }
+
+  .idea-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag-opt {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+  .tag-opt.selected { border-color: var(--tab-active-border); color: var(--accent); }
+  .idea-form-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+  /* Cards */
+  .ideas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  .idea-card {
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 14px;
+    transition: border-color 0.15s;
+  }
+  .idea-card:hover { border-color: var(--accent-hover); }
+
+  .idea-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--editor-fg);
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .idea-card-body {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+  }
+  .idea-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+
+  .idea-tag {
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .tag-hardware { background: #1e3a2e; color: #4ec9b0; border: 1px solid #2d5040; }
+  .tag-software { background: #1e2a3e; color: #569cd6; border: 1px solid #2d4060; }
+  .tag-idea     { background: #3e2d1e; color: #ce9178; border: 1px solid #604020; }
+  .tag-research { background: #2e1e3e; color: #c586c0; border: 1px solid #50306a; }
+  .tag-other    { background: #2d2d2d; color: #858585; border: 1px solid #3c3c3c; }
+
+  .idea-date { color: var(--text-muted); opacity: 0.6; }
+
+  .idea-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    opacity: 0;
+    transition: opacity 0.1s, color 0.1s;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+  }
+  .idea-card:hover .idea-delete { opacity: 1; }
+  .idea-delete:hover { color: #f44747; }
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithPopup, signOut, GoogleAuthProvider, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyATnRtU9xhbRJ7uezLMR0BKQLI9Wpik7g0",
+    authDomain: "website-1aa5e.firebaseapp.com",
+    projectId: "website-1aa5e",
+    storageBucket: "website-1aa5e.firebasestorage.app",
+    messagingSenderId: "888659482359",
+    appId: "1:888659482359:web:7ba2a28a392744352b65f2",
+    measurementId: "G-YJN5WS11S8"
+  };
+
+  const OWNER_EMAIL = "kevin.olson1836@gmail.com";
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const db       = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  let currentUser = null;
+  let allIdeas    = [];
+  let selectedTag = "idea";
+
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    const isOwner = user?.email === OWNER_EMAIL;
+    document.getElementById('sign-in-btn').style.display  = user ? 'none' : 'inline-block';
+    document.getElementById('sign-out-btn').style.display = user ? 'inline-block' : 'none';
+    document.getElementById('status-user').textContent    = user ? `● ${user.email}` : '';
+    document.getElementById('new-idea-btn').style.display = isOwner ? 'inline-block' : 'none';
+    document.getElementById('new-idea-btn').style.display = isOwner ? 'inline-block' : 'none';
+    document.getElementById('new-idea-btn2').style.display =(user && !isOwner) ? 'inline-block' : 'none';
+    renderIdeas();
+  });
+
+  document.getElementById('sign-in-btn').addEventListener('click', () =>
+    signInWithPopup(auth, provider).catch(console.error)
+  );
+  document.getElementById('sign-out-btn').addEventListener('click', () => signOut(auth));
+
+  document.getElementById('new-idea-btn').addEventListener('click', () => {
+    document.getElementById('add-form').style.display = 'block';
+    document.getElementById('new-idea-btn').style.display = 'none';
+    document.getElementById('idea-title').focus();
+  });
+
+  document.getElementById('cancel-idea-btn').addEventListener('click', closeForm);
+
+  document.getElementById('submit-idea-btn').addEventListener('click', async () => {
+    const title = document.getElementById('idea-title').value.trim();
+    const desc  = document.getElementById('idea-desc').value.trim();
+    if (!title || !currentUser || currentUser.email !== OWNER_EMAIL) return;
+    await addDoc(collection(db, 'ideas'), {
+      title, description: desc, tag: selectedTag, createdAt: serverTimestamp()
+    });
+    closeForm();
+    loadIdeas();
+  });
+
+  document.getElementById('tag-select').addEventListener('click', e => {
+    const btn = e.target.closest('.tag-opt');
+    if (!btn) return;
+    document.querySelectorAll('.tag-opt').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedTag = btn.dataset.tag;
+  });
+
+  function closeForm() {
+    document.getElementById('add-form').style.display = 'none';
+    if (currentUser?.email === OWNER_EMAIL)
+      document.getElementById('new-idea-btn').style.display = 'inline-block';
+    document.getElementById('idea-title').value = '';
+    document.getElementById('idea-desc').value  = '';
+  }
+
+  async function loadIdeas() {
+    const snap = await getDocs(query(collection(db, 'ideas'), orderBy('createdAt', 'desc')));
+    allIdeas = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderIdeas();
+  }
+
+  function renderIdeas() {
+    const container = document.getElementById('ideas-container');
+    const isOwner   = currentUser?.email === OWNER_EMAIL;
+
+    if (allIdeas.length === 0) {
+      container.innerHTML = `<p style="color:var(--text-muted)">No ideas yet.</p>`;
+      return;
+    }
+
+    container.innerHTML = `<div class="ideas-grid">${allIdeas.map(idea => {
+      const date = idea.createdAt?.toDate
+        ? idea.createdAt.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : '';
+      return `
+        <div class="idea-card">
+          <div class="idea-card-title">
+            <span>${esc(idea.title)}</span>
+            ${isOwner ? `<button class="idea-delete" data-id="${idea.id}" title="Delete">✕</button>` : ''}
+          </div>
+          ${idea.description ? `<div class="idea-card-body">${esc(idea.description)}</div>` : ''}
+          <div class="idea-card-footer">
+            <span class="idea-tag tag-${idea.tag}">${idea.tag}</span>
+            <span class="idea-date">${date}</span>
+          </div>
+        </div>`;
+    }).join('')}</div>`;
+
+    container.querySelectorAll('.idea-delete').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this idea?')) return;
+        await deleteDoc(doc(db, 'ideas', btn.dataset.id));
+        loadIdeas();
+      });
+    });
+  }
+
+  function esc(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  loadIdeas();
+</script>
