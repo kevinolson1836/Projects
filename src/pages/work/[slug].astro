@@ -30,6 +30,8 @@ const notesHtml = renderMarkdown(work.notes, `/images/${work.slug}/`, work.slug)
 
   <p>
     <strong>Status:</strong> {work.status}
+    <strong>Company:</strong> {work.company}
+    <strong>Started:</strong> {work.started}
     {work.progress >= -1 && <><br /><strong>Progress:</strong> {work.progress}%</>}
   </p>
 

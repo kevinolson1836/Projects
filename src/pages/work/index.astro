@@ -12,6 +12,39 @@ const projects = loadProjects();
 const projectList = projects.map((p) => ({ slug: p.slug, title: p.title }));
 
 const notesHtml = work ? renderMarkdown(work.notes, `/images/${work.slug}/`, work.slug) : '';
+console.log(work.started);
+
+
+function formatDate(date) {
+  const d = new Date(date);
+  const options = {year: 'numeric', month: 'short', day: 'numeric' };
+  return d.toLocaleDateString('en-US', options);
+}
+
+function getWorkDuration(workDuration) {
+  const start = new Date(workDuration.started);
+  const end = workDuration.ended ? new Date(workDuration.ended) : new Date();
+
+  let years = end.getFullYear() - start.getFullYear();
+  let months = end.getMonth() - start.getMonth();
+  let days = end.getDate() - start.getDate();
+
+  // Adjust days
+  if (days < 0) {
+    const prevMonth = new Date(end.getFullYear(), end.getMonth(), 0);
+    days += prevMonth.getDate();
+    months--;
+  }
+
+  // Adjust months
+  if (months < 0) {
+    months += 12;
+    years--;
+  }
+
+  return `${years}y ${months}m ${days}d`;
+}
+
 ---
 
 <EditorLayout
@@ -24,10 +57,11 @@ const notesHtml = work ? renderMarkdown(work.notes, `/images/${work.slug}/`, wor
     <>
       <h1>{work.title}</h1>
 
-      <p>
-        <strong>Status:</strong> {work.status}
-        {Number(work.progress) !== -1 && <><br /><strong>Progress:</strong> {work.progress}%</>}
-      </p>
+      <p><strong>Status:</strong> {work.status}</p>
+      <p><strong>Company:</strong> {work.company}</p>
+      <p><strong>Started:</strong> {formatDate(work.started)}</p>
+      {work.ended && <p><strong>Ended:</strong> {formatDate(work.ended)}</p>}
+      <p><strong>Duration:</strong> {getWorkDuration(work)}</p>
 
       <br>
       <br>

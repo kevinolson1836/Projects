@@ -14,9 +14,7 @@
 >   - ***Fan wall upgrades:*** Replacing the old fans on the airhandlers with new more efficient fans and updating programming and graphics (total 16 AHU's)
 > 
 > - ***Shirley Ryan Ability lab (~60 lab controllers)***
->   - Installed ~60 lab controllers on the 16th floor of the hospital, Lab's demand much higher tolerances for what can be allowed making the work far more complex than a typical build out. All devices must be in communication with as little down time as possible to enable the required tolerances. we tied multiple systems into our controllers allowing us to make smarter control over the systems. y
-I also tied our systems into the buildings fire alarm system for more safety.
->
+>   - Installed ~60 lab controllers on the 16th floor of the hospital, Lab's demand much higher tolerances for what can be allowed making the work far more complex than a typical build out. All devices must be in communication with as little down time as possible to enable the required tolerances. we tied multiple systems into our controllers allowing us to make smarter control over the systems. I also tied our systems into the buildings fire alarm system for more safety.
 >
 >
 > - ***Candy Factory (total ~250 replaced controllers)***

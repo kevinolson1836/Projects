@@ -25,9 +25,11 @@ export interface Work {
   status: string;
   progress: number;
   started: string;
+  ended: string | null;
   tags: string[];
   notes: string;
   models: string[];
+  company: string;
 }
 
 export function loadWork(): Work[] {
@@ -60,6 +62,8 @@ export function loadWork(): Work[] {
     status: (data.status as string) ?? 'unknown',
     progress: (data.progress as number) ?? 0,
     started: (data.started as string) ?? '',
+    ended: (data.ended as string | null) ?? null,
+    company: (data.company as string) ?? '',
     tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
     notes,
     models,
