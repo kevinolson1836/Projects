@@ -8,7 +8,7 @@
           "value": "wezterm.kevinolson.org"
         }
       ],
-      "destination": "wezterm.lua"
+      "destination": "/wezterm.lua"
     }
   ]
 }
