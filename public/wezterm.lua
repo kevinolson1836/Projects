@@ -6,6 +6,7 @@
 -- handled automatically.
 
 local wezterm = require("wezterm")
+local act = wezterm.action
 local config = wezterm.config_builder()
 
 -- ---------------------------------------------------------------------
@@ -167,6 +168,9 @@ config.keys = {
 
 	-- Launcher (shell picker on Windows, domain picker elsewhere)
 	{ key = "p", mods = "CTRL|SHIFT", action = wezterm.action.ShowLauncher },
+
+	-- Serial: Ctrl+S opens the serial device picker (see below)
+	{ key = "s", mods = "CTRL", action = act.EmitEvent("trigger-serial-connect") },
 }
 
 -- ---------------------------------------------------------------------
@@ -176,5 +180,111 @@ config.audible_bell = "Disabled"
 config.check_for_updates = true
 config.automatically_reload_config = true
 
+-- ---------------------------------------------------------------------
+-- Serial port support
+-- ---------------------------------------------------------------------
+
+-- Scans for connected USB/ACM serial devices
+local function get_serial_devices()
+	local devices = {}
+	local success, stdout = wezterm.run_child_process({
+		"bash", "-c", "ls /dev/tty{USB,ACM}* 2>/dev/null",
+	})
+	if success then
+		for line in stdout:gmatch("[^\r\n]+") do
+			table.insert(devices, line)
+		end
+	end
+	return devices
+end
+
+-- Event: pops a device picker, then opens picocom in a new tab
+wezterm.on("trigger-serial-connect", function(window, pane)
+	local devices = get_serial_devices()
+
+	if #devices == 0 then
+		-- hide_tab_bar_if_only_one_tab hides the bar (and right_status with
+		-- it) when there's only one tab open, so force it visible while
+		-- this message is showing, then revert.
+		window:set_config_overrides({ hide_tab_bar_if_only_one_tab = false })
+		window:set_right_status(wezterm.format({
+			{ Foreground = { Color = "#ff5555" } },
+			{ Text = "  No serial devices found" },
+		}))
+		wezterm.time.call_after(4, function()
+			window:set_right_status("")
+			window:set_config_overrides({})
+		end)
+		return
+	end
+
+	local choices = {}
+	for _, dev in ipairs(devices) do
+		table.insert(choices, { id = dev, label = dev })
+	end
+
+	window:perform_action(
+		act.InputSelector({
+			title = "Select Serial Device",
+			choices = choices,
+			action = wezterm.action_callback(function(inner_window, inner_pane, id, label)
+				if id then
+					inner_window:perform_action(
+						act.SpawnCommandInNewTab({
+							args = { "picocom", "-b", "115200", id },
+						}),
+						inner_pane
+					)
+				end
+			end),
+		}),
+		pane
+	)
+end)
+
+-- ---------------------------------------------------------------------
+-- SSH quick-connect
+-- ---------------------------------------------------------------------
+-- Assumes these are set up as Host aliases in ~/.ssh/config (recommended,
+-- since it keeps `ssh truenas` from a plain shell working the same way).
+-- Edit this list to match your actual homelab hosts.
+local ssh_hosts = {
+	{ label = "truenas", host = "truenas_admin@truenas.local" },
+	{ label = "proxmox", host = "proxmox.local" },
+	{ label = "udm", host = "udm.local" },
+}
+
+-- config.launch_menu is only set above on Windows, so make sure it
+-- exists before we start appending to it.
+config.launch_menu = config.launch_menu or {}
+
+for _, h in ipairs(ssh_hosts) do
+	table.insert(config.launch_menu, {
+		label = "SSH: " .. h.label,
+		args = { "ssh", h.host },
+	})
+end
+
+-- Makes "serial" and "ssh <host>" typeable/searchable in the Command
+-- Palette (Ctrl+Shift+P)
+wezterm.on("augment-command-palette", function(window, pane)
+	local entries = {
+		{
+			brief = "Serial: Connect to device",
+			icon = "md_serial_port",
+			action = act.EmitEvent("trigger-serial-connect"),
+		},
+	}
+
+	for _, h in ipairs(ssh_hosts) do
+		table.insert(entries, {
+			brief = "SSH: " .. h.label,
+			icon = "md_server_network",
+			action = act.SpawnCommandInNewTab({ args = { "ssh", h.host } }),
+		})
+	end
+
+	return entries
+end)
 
 return config
