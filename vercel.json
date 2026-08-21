@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "file.kevinolson.org"
+        }
+      ],
+      "destination": "/resume.pdf"
+    }
+  ]
+}
