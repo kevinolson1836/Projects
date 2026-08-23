@@ -36,6 +36,18 @@ else
 	config.font_size = 12.0
 end
 
+config.window_frame = {
+	font_size = 14.0,
+}
+
+config.colors = {
+	tab_bar = {
+	  -- The color of the inactive tab bar edge/divider
+	  inactive_tab_edge = '#1cacd9',
+	},
+  }
+
+
 config.window_background_opacity = 0.95
 config.macos_window_background_blur = 20 -- ignored on non-mac
 config.window_decorations = "TITLE | RESIZE"
@@ -46,11 +58,25 @@ config.window_padding = {
 	bottom = 8,
 }
 
+config.window_background_gradient = {
+	colors = { '#1e1e1e', '#252526', '#1a1a2e' },
+	orientation = { Linear = { angle = -45.0 } },
+	interpolation = 'Linear',
+	blend = 'Rgb',
+  }
+
+
 config.enable_tab_bar = true
 config.hide_tab_bar_if_only_one_tab = true
-config.use_fancy_tab_bar = false
+config.use_fancy_tab_bar = true
 config.tab_bar_at_bottom = false
 
+config.inactive_pane_hsb = {
+	saturation = 0.6,  -- lower = more desaturated/grayed out
+	brightness = 0.6,  -- lower = darker
+  }
+
+  
 -- ---------------------------------------------------------------------
 -- Scrollback / performance
 -- ---------------------------------------------------------------------
@@ -63,8 +89,14 @@ config.front_end = "WebGpu" -- falls back automatically if unsupported
 -- Shell / platform-specific defaults
 -- ---------------------------------------------------------------------
 if is_windows then
-	-- Default to PowerShell 7 if installed, else Windows PowerShell
-	config.default_prog = { "pwsh.exe" }
+	-- Default to PowerShell 7 if installed, else fall back to Windows
+	-- PowerShell. This actually checks for pwsh.exe on PATH instead of
+	-- assuming it's there -- avoids "didn't exit cleanly" new-tab errors
+	-- on machines that don't have PS7 installed.
+	local has_pwsh = false
+	local success, stdout = wezterm.run_child_process({ "where", "pwsh.exe" })
+
+	config.default_prog = { "cmd.exe" }
 
 	-- Handy launch menu for switching shells on Windows
 	config.launch_menu = {
@@ -88,7 +120,8 @@ end
 -- ---------------------------------------------------------------------
 -- Keybindings
 -- ---------------------------------------------------------------------
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+
+-- config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
 
 -- Shared: copy if text is selected, otherwise send the normal Ctrl+C
 -- interrupt (SIGINT) so stuck commands can still be killed.
@@ -104,25 +137,25 @@ end
 
 config.keys = {
 	-- Splits (tmux-style leader key)
-	{ key = "|", mods = "LEADER|SHIFT", action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-	{ key = "-", mods = "LEADER", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "|", mods = "SHIFT", action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	-- { key = "-", mods = "CTRL", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
 
 	-- Pane navigation
-	{ key = "h", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Left") },
-	{ key = "l", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Right") },
-	{ key = "k", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Up") },
-	{ key = "j", mods = "LEADER", action = wezterm.action.ActivatePaneDirection("Down") },
+	{ key = "LeftArrow", mods = "SHIFT", action = wezterm.action.ActivatePaneDirection("Left") },
+	{ key = "RightArrow", mods = "SHIFT", action = wezterm.action.ActivatePaneDirection("Right") },
+	{ key = "UpArrow", mods = "SHIFT", action = wezterm.action.ActivatePaneDirection("Up") },
+	{ key = "DownArrow", mods = "SHIFT", action = wezterm.action.ActivatePaneDirection("Down") },
 
 	-- Close pane
-	{ key = "x", mods = "LEADER", action = wezterm.action.CloseCurrentPane({ confirm = true }) },
+	{ key = "x", mods = "CTRL", action = wezterm.action.CloseCurrentPane({ confirm = true }) },
 
 	-- Tabs
 	-- Browser-style new tab. This overrides WezTerm's default Ctrl+Shift+T
 	-- binding for new tab — Ctrl+T now does it without needing Shift.
 	{ key = "t", mods = "CTRL", action = wezterm.action.SpawnTab("CurrentPaneDomain") },
-	{ key = "t", mods = "LEADER", action = wezterm.action.SpawnTab("CurrentPaneDomain") },
-	{ key = "n", mods = "LEADER", action = wezterm.action.ActivateTabRelative(1) },
-	{ key = "p", mods = "LEADER", action = wezterm.action.ActivateTabRelative(-1) },
+	-- { key = "t", mods = "SHIFT", action = wezterm.action.SpawnTab("CurrentPaneDomain") },
+	{ key = "RightArrow", mods = "CTRL", action = wezterm.action.ActivateTabRelative(1) },
+	{ key = "LeftArrow", mods = "CTRL", action = wezterm.action.ActivateTabRelative(-1) },
 
 	-- Browser-style tab close. NOTE: Ctrl+W is also the readline shortcut
 	-- for "delete word backward" in bash/zsh/PowerShell — binding it here
